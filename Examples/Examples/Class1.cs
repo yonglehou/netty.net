@@ -98,15 +98,22 @@ namespace ExamplesClient
             index += 4;
             index += 16;*/
 
-            BytesBuffer bb = BytesBufferFactory.Instance.StringBuffer("aaazzz");
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < 100; i++)
+            {
+                sb.Append("aaaaaaaaaa");
+            }
+
+            BytesBuffer bb = BytesBufferFactory.Instance.StringBuffer(sb.ToString());
 
 
             handler.connectEvent.WaitOne();
             while (true)
             {
                 handler.mycontext.Send(bb);
+                
                 //session.Send(senddata, 0, senddata.Length);
-                //System.Threading.Thread.Sleep(10);
+                System.Threading.Thread.Sleep(1000);
             }
         }
 

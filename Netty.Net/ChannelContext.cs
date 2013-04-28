@@ -66,11 +66,18 @@ namespace Netty.Net
             Socket socket = context.GetSocket();
             try
             {
-
-                int readBytes = socket.EndReceive(ar);
-                context.Decoder.Decode(context, readBytes);
-
                 SocketError error;
+                int readBytes = socket.EndReceive(ar,out error);
+                if (error == SocketError.ConnectionReset)
+                {
+                    //连接断开
+                }
+                
+
+                context.Decoder.Decode(context, readBytes);
+                
+
+                
                 socket.BeginReceive(context.RecieveBuffer.Bytes(), context.RecieveBuffer.WriterIndex(), context.RecieveBuffer.WriteableBytes(), SocketFlags.None, out error, new AsyncCallback(recieveCallback), context);
                 if (error != SocketError.Success)
                 {
@@ -93,7 +100,11 @@ namespace Netty.Net
             bool istaken = false;
             try
             {
-                int sentBytes = socket.EndSend(ar);
+                SocketError error;
+                int sentBytes = socket.EndSend(ar,out error);
+                
+                Console.WriteLine(error.ToString());
+
                 handler.WriteComplete(context, sentBytes);
                 Monitor.Enter(context.sendLockObj, ref istaken);
 
@@ -110,7 +121,7 @@ namespace Netty.Net
                 }
                 if (bb.ReadableBytes() > 0)
                 {
-                    SocketError error;
+                    
                     socket.BeginSend(bb.Bytes(), bb.ReaderIndex(), bb.ReadableBytes(), SocketFlags.None, out error, new AsyncCallback(sendCallback), context);
                     if (error != SocketError.Success)
                     {

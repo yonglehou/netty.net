@@ -17,7 +17,17 @@ namespace ExampleServer
         public static int readCount = 0;
         public static int writeBytes = 0;
 
-        BytesBuffer sendbuf = BytesBufferFactory.Instance.StringBuffer("hello");
+        BytesBuffer sendbuf;// = BytesBufferFactory.Instance.StringBuffer("hello");
+
+        public myChannelHandler()
+        {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < 100; i++)
+            {
+                sb.Append("zzzzzzzzzz");
+            }
+            sendbuf = BytesBufferFactory.Instance.StringBuffer(sb.ToString());
+        }
 
         public override void ChannelConnect(ChannelContext context)
         {
@@ -30,6 +40,7 @@ namespace ExampleServer
             Interlocked.Increment(ref readCount);
             Interlocked.Add(ref readBytes, length+4);
 
+            System.Threading.Thread.Sleep(1000);
             context.Send(sendbuf);
 
             

@@ -100,6 +100,16 @@ namespace Netty.Net
             writerIndex = _writerIndex;
         }
 
+        public int GetInt(int index)
+        {
+            if (ReadableBytes() < 4)
+            {
+                return 0;
+            }
+            int ret = BitConverter.ToInt32(bytes, index);
+            return ret;
+        }
+
         public int ReadInt()
         {
             if (ReadableBytes() < 4)
@@ -108,6 +118,17 @@ namespace Netty.Net
             }
             int ret= BitConverter.ToInt32(bytes, readerIndex);
             readerIndex += 4 ;
+            return ret;
+        }
+
+        public Int16 GetInt16(int index)
+        {
+            if (ReadableBytes() < 2)
+            {
+                return 0;
+            }
+            Int16 ret = BitConverter.ToInt16(bytes, index);
+            readerIndex += 2;
             return ret;
         }
 

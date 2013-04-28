@@ -57,19 +57,21 @@ namespace Netty.Net
 
             int package_get = 0;
             ChannelHandler hanlder = obj.ChannelHandler;
-            while (bb.ReadableBytes() >=recieveOffset +(int) headSize)
+            while (bb.ReadableBytes() >=recieveOffset +(int) headSize )
             {
                 bb.ReadSlice(recieveOffset);
                 int totalLength=0;
+                int reader = bb.ReaderIndex() + recieveOffset;
                 switch (headSize)
                 {
-                    case HeadLengthFieldType.Int32: totalLength = bb.ReadInt(); break;
-                    case HeadLengthFieldType.Int16: totalLength = bb.ReadInt16(); break;
+                    case HeadLengthFieldType.Int32: totalLength = bb.GetInt(reader); break;
+                    case HeadLengthFieldType.Int16: totalLength = bb.GetInt16(reader); break;
                 }
                 int bodyLength = totalLength - recieveOffset - (int)headSize;
-                if (bb.ReadableBytes() >= bodyLength)
+                if (bb.ReadableBytes() >= totalLength)
                 {
                     //能读出一个package
+                    bb.ReadSlice(recieveOffset + (int)headSize);
                     hanlder.MessageRecieve(obj, bb.Bytes(), bb.ReaderIndex(), bodyLength);
 
                     bb.ReadSlice(bodyLength);

@@ -7,8 +7,8 @@
     <ProjectGuid>{2192D95F-36E5-4AA2-81F9-8647703ABFBD}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Examples</RootNamespace>
-    <AssemblyName>Examples</AssemblyName>
+    <RootNamespace>ExampleClient</RootNamespace>
+    <AssemblyName>ExampleClient</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
