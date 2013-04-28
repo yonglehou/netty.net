@@ -15,6 +15,9 @@ namespace ExampleServer
         public static int connectCount = 0;
         public static int readBytes = 0;
         public static int readCount = 0;
+        public static int writeBytes = 0;
+
+        BytesBuffer sendbuf = BytesBufferFactory.Instance.StringBuffer("hello");
 
         public override void ChannelConnect(ChannelContext context)
         {
@@ -25,14 +28,17 @@ namespace ExampleServer
         public override void MessageRecieve(ChannelContext context, byte[] bytes, int index, int length)
         {
             Interlocked.Increment(ref readCount);
-            Interlocked.Add(ref readBytes, length);
+            Interlocked.Add(ref readBytes, length+4);
+
+            context.Send(sendbuf);
 
             
         }
 
         public override void WriteComplete(ChannelContext context, int length)
         {
-            base.WriteComplete(context, length);
+            Interlocked.Add(ref writeBytes, length);
+            //base.WriteComplete(context, length);
         }
 
         public override void ExceptionCaught(ChannelContext context, Exception ex)
@@ -51,9 +57,10 @@ namespace ExampleServer
 
         public static void StatTimerFunc(object obj)
         {
-            Console.WriteLine("连接数:{0},收到包数:{1} p/s,字节数:{2} kb/s", myChannelHandler.connectCount, myChannelHandler.readCount / timer_second, myChannelHandler.readBytes / timer_second / 1024);
+            Console.WriteLine("连接数:{0},收到包数:{1} p/s,字节数:{2} kb/s,发送字节数 {3} kb/s", myChannelHandler.connectCount, myChannelHandler.readCount / timer_second, myChannelHandler.readBytes / timer_second / 1024,myChannelHandler.writeBytes/timer_second/1024);
             Interlocked.Exchange(ref myChannelHandler.readBytes, 0);
             Interlocked.Exchange(ref myChannelHandler.readCount, 0);
+            Interlocked.Exchange(ref myChannelHandler.writeBytes, 0);
         }
 
         public static void Main()

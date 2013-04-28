@@ -32,10 +32,10 @@ namespace ExamplesClient
         public override void MessageRecieve(ChannelContext context, byte[] bytes, int index, int length)
         {
             Interlocked.Increment(ref  myHandler.recvCount);
-            Interlocked.Add(ref recvBytes, length);
+            Interlocked.Add(ref recvBytes, length+4);
 
             string str = Encoding.ASCII.GetString(bytes, index, length);
-            Console.WriteLine(str);
+            //Console.WriteLine(str);
         }
 
         public override void WriteComplete(ChannelContext context, int length)
@@ -45,7 +45,7 @@ namespace ExamplesClient
 
         public override void ExceptionCaught(ChannelContext context, Exception ex)
         {
-            Console.WriteLine(ex.ToString());
+            //Console.WriteLine(ex.ToString());
         }
 
         public override void ChannelClose(ChannelContext context)

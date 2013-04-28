@@ -18,7 +18,13 @@ namespace Netty.Net
         /// <returns></returns>
         public virtual int Decode(ChannelContext obj, int recieveBytes)
         {
-            return 0;
+            BytesBuffer bb = obj.RecieveBuffer;
+            bb.WriteSlice(recieveBytes);
+            ChannelHandler handler = obj.ChannelHandler;
+            handler.MessageRecieve(obj, bb.Bytes(), bb.ReaderIndex(), bb.ReadableBytes());
+            bb.Set(0, 0);
+
+            return recieveBytes;
         }
     }
 
@@ -61,11 +67,17 @@ namespace Netty.Net
                     case HeadLengthFieldType.Int16: totalLength = bb.ReadInt16(); break;
                 }
                 int bodyLength = totalLength - recieveOffset - (int)headSize;
-                if (bb.ReadableBytes() >=bodyLength)
+                if (bb.ReadableBytes() >= bodyLength)
                 {
                     //能读出一个package
                     hanlder.MessageRecieve(obj, bb.Bytes(), bb.ReaderIndex(), bodyLength);
+
+                    bb.ReadSlice(bodyLength);
                     ++package_get;
+                }
+                else
+                {
+                    break;
                 }
             }
 
@@ -73,6 +85,10 @@ namespace Netty.Net
             {
                 bb.SetBytes(bb.Bytes(), bb.ReaderIndex(), bb.ReadableBytes(), 0);
                 bb.ReaderIndex(0);
+            }
+            else
+            {
+                bb.Set(0, 0);
             }
             return package_get;
         }

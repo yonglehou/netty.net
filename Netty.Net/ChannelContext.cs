@@ -79,6 +79,7 @@ namespace Netty.Net
             }
             catch (Exception ex)
             {
+                context.Close();
                 handler.ExceptionCaught(context, ex);
             }
             context.Active();
@@ -120,6 +121,7 @@ namespace Netty.Net
             }
             catch (Exception ex)
             {
+                context.Close();
                 handler.ExceptionCaught(context, ex);
             }
             finally
@@ -139,7 +141,7 @@ namespace Netty.Net
             }
             catch (Exception ex)
             {
-
+                Console.WriteLine("close exception:{0}",ex.Message);
             }
         }
 
@@ -153,8 +155,9 @@ namespace Netty.Net
         }
 
 
-        public void Send(BytesBuffer mybuffer)
+        public bool Send(BytesBuffer mybuffer)
         {
+            bool sendresult = true;
             bool istaken = false;
             BytesBuffer newbuffer = Encoder.Encode(this, mybuffer);
             try
@@ -163,7 +166,8 @@ namespace Netty.Net
                 bool isempty = SendBuffer.ReadableBytes() == 0;
                 if (!SendBuffer.WriteBytes(newbuffer.Bytes(), newbuffer.ReaderIndex(), newbuffer.ReadableBytes()))
                 {
-                    ChannelHandler.ExceptionCaught(this, new Exception("try write failed"));
+                    //ChannelHandler.ExceptionCaught(this, new Exception("try write failed"));
+                    sendresult = false;
                 }
                 else
                 {
@@ -183,6 +187,7 @@ namespace Netty.Net
             {
                 if (istaken) Monitor.Exit(sendLockObj);
             }
+            return sendresult;
         }
 
     }
